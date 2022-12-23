@@ -1,15 +1,20 @@
 package Budget;
 
+import Budget.status.BudgetStatus;
+import Budget.status.InAnalysis;
+
 import java.math.BigDecimal;
 
 public class Budget {
     private BigDecimal value;
     private final int itemQuantity;
-    private String state;
+//    STATE PATTERN
+    private BudgetStatus status;
 
     public Budget(BigDecimal value, int itemQuantity) {
         this.value = value;
         this.itemQuantity = itemQuantity;
+        this.status = new InAnalysis();
     }
 
     public BigDecimal getValue() {
@@ -21,12 +26,24 @@ public class Budget {
     }
 
     public void applyExtraDiscount() {
-        BigDecimal extraDiscount = BigDecimal.ZERO;
-        if (state.equals("IN_ANALYSIS")) {
-            extraDiscount = new BigDecimal("0.05").multiply(this.value);
-        } else if(state.equals("APPROVED")) {
-            extraDiscount = new BigDecimal("0.02").multiply(this.value);
-        }
+        BigDecimal extraDiscount = this.status.calculateExtraDiscount(this);
+
         this.value = this.value.subtract(extraDiscount);
+    }
+
+    public void approve() {
+        this.status.approve(this);
+    }
+
+    public void reject() {
+        this.status.reject(this);
+    }
+
+    public void done() {
+        this.status.done(this);
+    }
+
+    public void updateStatus(BudgetStatus status) {
+        this.status = status;
     }
 }
